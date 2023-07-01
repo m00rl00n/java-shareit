@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-
 import java.util.List;
 
 @RestController
@@ -25,6 +24,7 @@ public class ItemController {
     public List<ItemDto> getItems(@RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId) {
         return itemService.getItemsByUserId(userId);
     }
+
     @GetMapping("/{itemId}")
     public ItemDto getItemById(
             @RequestHeader(value = USER_ID_REQUEST_HEADER)
