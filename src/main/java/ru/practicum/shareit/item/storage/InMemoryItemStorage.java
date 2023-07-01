@@ -28,17 +28,21 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public Item addItem(Integer id, Item item) {
-        validateItem(item);
+    public Item add(Integer id, Item item) {
+        validate(item);
         loadItems();
-        if (!items.containsKey(id)) throw new NotFoundException("Пользователь id=" + id + " не найден.");
-        if (item.getId() == null) item.setId(generateId());
+        if (!items.containsKey(id)) {
+            throw new NotFoundException("Пользователь id=" + id + " не найден.");
+        }
+        if (item.getId() == null) {
+            item.setId(generateId());
+        }
         addItemToList(id, item);
         return item;
     }
 
     @Override
-    public Item updateItem(Integer userId, Integer itemId, Item updatedItem) {
+    public Item update(Integer userId, Integer itemId, Item updatedItem) {
         List<Item> userItems = getItemsByUserId(userId);
         for (Item item : userItems) {
             if (item.getId().equals(itemId)) {
@@ -91,10 +95,16 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public List<Item> searchItems(Integer id, String text) {
-        if (text.isBlank()) return new ArrayList<>();
+    public List<Item> search(Integer id, String text) {
+        if (text == null || text.isBlank()) {
+            return new ArrayList<>();
+        }
+
         List<Item> foundItems = new ArrayList<>();
-        if (items.get(id) == null) throw new NotFoundException("У пользователя id=" + id + " не найдены вещи");
+        if (items.get(id) == null) {
+            throw new NotFoundException("У пользователя id=" + id + " не найдены вещи");
+        }
+
         for (Item item : getItems()) {
             if ((item.getName().toLowerCase().contains(text.toLowerCase())
                     || item.getDescription().toLowerCase().contains(text.toLowerCase()))
@@ -102,7 +112,11 @@ public class InMemoryItemStorage implements ItemStorage {
                 foundItems.add(item);
             }
         }
-        if (foundItems.isEmpty()) throw new NotFoundException("Вещи, содержащие \"" + text + "\" не найдены");
+
+        if (foundItems.isEmpty()) {
+            throw new NotFoundException("Вещи, содержащие \"" + text + "\" не найдены");
+        }
+
         return foundItems;
     }
 
@@ -131,7 +145,7 @@ public class InMemoryItemStorage implements ItemStorage {
         return id++;
     }
 
-    private void validateItem(Item item) {
+    private void validate(Item item) {
         StringBuilder message = new StringBuilder();
         if (item.getDescription() == null || item.getName().isBlank()) {
             message.append("Не указано название. ");

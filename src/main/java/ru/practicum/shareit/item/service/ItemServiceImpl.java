@@ -32,9 +32,9 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoMapper.toDtoList(items);
     }
 
-    public ItemDto addItem(Integer id, ItemDto itemDto) {
+    public ItemDto add(Integer id, ItemDto itemDto) {
         log.info("Добавление вещи");
-        return itemDtoMapper.toDto(itemStorage.addItem(id, itemDtoMapper.toEntity(itemDto)));
+        return itemDtoMapper.toDto(itemStorage.add(id, itemDtoMapper.toEntity(itemDto)));
     }
 
     public ItemDto getItemById(Integer id) {
@@ -43,16 +43,16 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoMapper.toDto(item);
     }
 
-    public List<ItemDto> searchItems(Integer id, String text) {
-        List<Item> items = itemStorage.searchItems(id, text);
+    public List<ItemDto> search(Integer id, String text) {
+        List<Item> items = itemStorage.search(id, text);
         List<ItemDto> itemsDto = itemDtoMapper.toDtoList(items);
         log.info("Поиск вещи");
         return itemsDto;
     }
 
-    public ItemDto updateItem(Integer userId, Integer itemId, ItemDto newItemDto) {
+    public ItemDto update(Integer userId, Integer itemId, ItemDto newItemDto) {
         Item updatedItem = itemDtoMapper.toEntity(newItemDto);
-        Item item = itemStorage.updateItem(userId, itemId, updatedItem);
+        Item item = itemStorage.update(userId, itemId, updatedItem);
         log.info("Обновление вещи");
         return itemDtoMapper.toDto(item);
     }

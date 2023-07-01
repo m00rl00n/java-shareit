@@ -31,16 +31,16 @@ public class UserController {
 
     @PostMapping
     public UserDto addUser(@RequestBody UserDto userDto) {
-        return userService.addUser(userDto);
+        return userService.add(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto updateUser(@PathVariable Integer userId, @RequestBody UserDto userDto) {
-        return userService.updateUser(userDto, userId);
+        return userService.update(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
     public void removeUser(@PathVariable Integer userId) {
-        userService.removeUser(userId);
+        userService.remove(userId);
     }
 }

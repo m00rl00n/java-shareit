@@ -3,8 +3,8 @@ package ru.practicum.shareit.user.dto;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class UserDtoMapper {
@@ -25,11 +25,9 @@ public class UserDtoMapper {
     }
 
     public List<UserDto> toDtoList(List<User> users) {
-        List<UserDto> userDtos = new ArrayList<>();
-        for (User user : users) {
-            userDtos.add(toDto(user));
-        }
-        return userDtos;
+        return users.stream()
+                .map(UserDtoMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
 

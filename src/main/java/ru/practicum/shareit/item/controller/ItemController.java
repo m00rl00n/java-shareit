@@ -36,14 +36,14 @@ public class ItemController {
     public List<ItemDto> searchItemsByText(
             @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
             @RequestParam String text) {
-        return itemService.searchItems(userId, text);
+        return itemService.search(userId, text);
     }
 
     @PostMapping
     public ItemDto addItem(
             @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
             @RequestBody ItemDto itemDto) {
-        return itemService.addItem(userId, itemDto);
+        return itemService.add(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
@@ -51,6 +51,6 @@ public class ItemController {
             @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
             @PathVariable Integer itemId,
             @RequestBody ItemDto itemDto) {
-        return itemService.updateItem(userId, itemId, itemDto);
+        return itemService.update(userId, itemId, itemDto);
     }
 }

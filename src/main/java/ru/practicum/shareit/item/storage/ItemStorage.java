@@ -9,11 +9,11 @@ public interface ItemStorage {
 
     List<Item> getItems();
 
-    Item updateItem(Integer userId, Integer itemId, Item newItem);
+    Item update(Integer userId, Integer itemId, Item newItem);
 
     Item getItemById(Integer itemId);
 
-    Item addItem(Integer userId, Item mapDto);
+    Item add(Integer userId, Item mapDto);
 
-    List<Item> searchItems(Integer userId, String text);
+    List<Item> search(Integer userId, String text);
 }

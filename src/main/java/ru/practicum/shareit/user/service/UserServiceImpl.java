@@ -40,22 +40,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto addUser(UserDto user) {
+    public UserDto add(UserDto user) {
         log.info("Добавление нового пользователя");
         User userNew = userDtoMapper.toEntity(user);
-        return userDtoMapper.toDto(userStorage.addUser(userNew));
+        return userDtoMapper.toDto(userStorage.add(userNew));
     }
 
     @Override
-    public UserDto updateUser(UserDto user, Integer id) {
+    public UserDto update(UserDto user, Integer id) {
         log.info("Обновление информации о пользователе id=" + id);
         User userNew = userStorage.getUser(id);
-        return UserDtoMapper.toDto(userStorage.updateUser(id, UserDtoMapper.toEntity(user)));
+        return UserDtoMapper.toDto(userStorage.update(id, UserDtoMapper.toEntity(user)));
     }
 
     @Override
-    public void removeUser(Integer id) {
+    public void remove(Integer id) {
         log.info("Удаление пользователя id=" + id);
-        userStorage.removeUser(id);
+        userStorage.remove(id);
     }
 }

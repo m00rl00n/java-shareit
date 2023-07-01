@@ -32,8 +32,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user) {
-        validateUser(user);
+    public User add(User user) {
+        validate(user);
         emailValidator(user.getId(), user.getEmail());
         user.setId(++id);
         users.put(id, user);
@@ -41,7 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(Integer userId, User user) {
+    public User update(Integer userId, User user) {
         User existingUser = users.get(userId);
         if (user.getName() != null) {
             existingUser.setName(user.getName());
@@ -56,11 +56,11 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void removeUser(Integer id) {
+    public void remove(Integer id) {
         users.remove(id);
     }
 
-    private void validateUser(User user) {
+    private void validate(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             throw new ValidationException("Логин не может быть пустым");
         }
