@@ -258,7 +258,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Нужно указать владельца");
         }
         if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
-            throw new ValidationException("Название вещи не может быть пустым");
+            throw new ValidationException("Нужно указать название вещи");
         }
 
         if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
