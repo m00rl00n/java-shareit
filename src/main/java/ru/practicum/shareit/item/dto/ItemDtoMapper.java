@@ -1,39 +1,40 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-@Component
 public class ItemDtoMapper {
-    public ItemDto toDto(Item item) {
-        ItemDto dto = new ItemDto();
-        dto.setId(item.getId());
-        dto.setName(item.getName());
-        dto.setDescription(item.getDescription());
-        dto.setAvailable(item.getAvailable());
-        dto.setOwner(item.getOwner());
-        dto.setRequestId(item.getRequestId());
-        return dto;
+    public static ItemDtoOwner toItemDtoOwner(Item item) {
+        ItemDtoOwner itemDtoOwner = new ItemDtoOwner();
+        itemDtoOwner.setId(item.getId());
+        itemDtoOwner.setName(item.getName());
+        itemDtoOwner.setDescription(item.getDescription());
+        itemDtoOwner.setAvailable(item.getAvailable());
+        itemDtoOwner.setRequest(item.getRequest());
+        itemDtoOwner.setLastBooking(null);
+        itemDtoOwner.setNextBooking(null);
+        return itemDtoOwner;
     }
 
-    public Item toEntity(ItemDto itemDto) {
+    public static ItemDto toItemDto(Item item) {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(item.getId());
+        itemDto.setName(item.getName());
+        itemDto.setDescription(item.getDescription());
+        itemDto.setAvailable(item.getAvailable());
+        itemDto.setOwner(item.getOwner());
+        itemDto.setRequest(item.getRequest());
+        return itemDto;
+    }
+
+    public static Item toItem(ItemDto itemDto, User user) {
         Item item = new Item();
         item.setId(itemDto.getId());
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-        item.setOwner(itemDto.getOwner());
-        item.setRequestId(itemDto.getRequestId());
+        item.setOwner(user);
+        item.setRequest(itemDto.getRequest());
         return item;
     }
-
-    public List<ItemDto> toDtoList(List<Item> items) {
-        return items.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
 }
