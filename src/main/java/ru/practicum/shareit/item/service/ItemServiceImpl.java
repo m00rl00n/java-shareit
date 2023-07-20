@@ -255,7 +255,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void validate(ItemDto itemDto, Integer userId) {
         if (userId == null) {
-            throw new NotFoundException("Невозможно создать вещь не указывая ее владельца");
+            throw new NotFoundException("Нужно указать владельца");
         }
         if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
             throw new ValidationException("Название вещи не может быть пустым");
