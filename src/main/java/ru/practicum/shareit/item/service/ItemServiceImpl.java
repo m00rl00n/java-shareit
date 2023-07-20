@@ -265,7 +265,7 @@ public class ItemServiceImpl implements ItemService {
             throw new ValidationException("Описание вещи не может быть пустым");
         }
         if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Необходимо указать доступна ли вещь");
+            throw new ValidationException("Необходимо указать доступность");
         }
     }
 }
