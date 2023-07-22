@@ -26,8 +26,8 @@ import java.util.List;
 
 import static ru.practicum.shareit.booking.model.Status.APPROVED;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemServiceImpl implements ItemService {
@@ -35,7 +35,6 @@ public class ItemServiceImpl implements ItemService {
     final UserRepository userRepository;
     final BookingRepository bookingRepository;
     final CommentRepository commentRepository;
-
 
     @Override
     public ItemDto add(ItemDto itemDto, Integer id) {
@@ -255,12 +254,11 @@ public class ItemServiceImpl implements ItemService {
 
     private void validate(ItemDto itemDto, Integer userId) {
         if (userId == null) {
-            throw new NotFoundException("Нужно указать владельца");
+            throw new NotFoundException("Невозможно создать вещь не указывая ее владельца");
         }
         if (itemDto.getName() == null || itemDto.getName().isEmpty()) {
-            throw new ValidationException("Нужно указать название вещи");
+            throw new ValidationException("Название вещи не может быть пустым");
         }
-
         if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
             throw new ValidationException("Описание вещи не может быть пустым");
         }

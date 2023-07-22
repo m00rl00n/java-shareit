@@ -22,35 +22,30 @@ public class BookingController {
     @PostMapping
     public BookingDtoReturned createBooking(@RequestBody BookingDtoReceived bookingDto,
                                             @RequestHeader("X-Sharer-User-Id") Integer userId) {
-        log.info("Создание нового бронирования");
         return bookingService.create(bookingDto, userId);
     }
 
     @PatchMapping("/{bookingId}")
     public BookingDtoReturned bookingConfirmation(@PathVariable Integer bookingId, @RequestParam Boolean approved,
                                                   @RequestHeader("X-Sharer-User-Id") Integer userId) {
-        log.info("Подтверждение бронирования с айди " + bookingId + " владельцем вещи");
         return bookingService.bookingConfirmation(bookingId, approved, userId);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDtoReturned getBookingById(@PathVariable Integer  bookingId,
+    public BookingDtoReturned getBookingById(@PathVariable Integer bookingId,
                                              @RequestHeader("X-Sharer-User-Id") Integer userId) {
-        log.info("Просмотр бронирования с айди " + bookingId);
         return bookingService.getBookingById(bookingId, userId);
     }
 
     @GetMapping
     public List<BookingDtoReturned> getAllBookingsByUser(@RequestParam(defaultValue = "ALL") String state,
-                                                         @RequestHeader("X-Sharer-User-Id") Integer  userId) {
-        log.info("Просмотр бронирований пользователем с айди " + userId);
+                                                         @RequestHeader("X-Sharer-User-Id") Integer userId) {
         return bookingService.getAllBookingsByUser(state, userId);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoReturned> getAllBookingsByOwner(@RequestParam(defaultValue = "ALL") String state,
-                                                          @RequestHeader("X-Sharer-User-Id") Integer  userId) {
-        log.info("Просмотр бронирований владельцем с айди " + userId);
+                                                          @RequestHeader("X-Sharer-User-Id") Integer userId) {
         return bookingService.getAllBookingsByOwner(state, userId);
     }
 }
