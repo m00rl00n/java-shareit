@@ -33,8 +33,8 @@ public class RequestServiceIntegrationTest {
     @Autowired
     private ItemServiceImpl itemService;
 
-    private final User user = new User(null, "masha@yandex.ru","Маша");
-    private final User user2 = new User(null, "masha1@yandex.ru","Маша1");
+    private final User user = new User(null, "masha@yandex.ru", "Маша");
+    private final User user2 = new User(null, "masha1@yandex.ru", "Маша1");
     private final ItemRequest request = new ItemRequest(null, "request", user2, LocalDateTime.now());
 
 
@@ -159,5 +159,6 @@ public class RequestServiceIntegrationTest {
         assertEquals(requestDto.getDescription(), request.getDescription());
         assertEquals(requestDto.getRequestorId(), user.getId());
     }
+
 
 }

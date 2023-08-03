@@ -460,6 +460,24 @@ public class BookingServiceIntegrationTest {
                 () -> bookingService.getAllBookingsByOwner("ALL", 3, 2, 10));
     }
 
+    @Test
+    void bookingConfirmationThrowsNotFoundExceptionTest() {
+        UserDto userDto = userService.add(UserDtoMapper.toDto(user));
+        user.setId(userDto.getId());
+
+        UserDto bookerDto = userService.add(UserDtoMapper.toDto(booker));
+        booker.setId(bookerDto.getId());
+
+        ItemDto itemDto = itemService.add(ItemDtoMapper.toItemDto(item), userDto.getId());
+        item.setId(itemDto.getId());
+
+        BookingDtoReturned bookingDtoReturned =
+                bookingService.create(BookingDtoMapper.toBookingDtoReceived(booking), booker.getId());
+
+        assertThrows(NotFoundException.class,
+                () -> bookingService.bookingConfirmation(bookingDtoReturned.getId(), true, booker.getId()));
+    }
+
 }
 
 

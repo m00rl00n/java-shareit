@@ -104,7 +104,7 @@ public class ItemServiceImpl implements ItemService {
         return CommentDtoMapper.toCommentDto(commentRepository.save(comment));
     }
 
-    private void validateCommentText(CommentDto commentDto) {
+    public void validateCommentText(CommentDto commentDto) {
         if (commentDto.getText().isBlank() || commentDto.getText().isEmpty()) {
             throw new ValidationException("Нельзя оставить пустой комментарий о вещи");
         }

@@ -154,6 +154,7 @@ RequestServiceImplTest {
         assertEquals(itemRequestDto.getItems().size(), result.getItems().size());
     }
 
+
     private User createUser(Integer id, String name, String email) {
         User user = new User();
         user.setId(id);

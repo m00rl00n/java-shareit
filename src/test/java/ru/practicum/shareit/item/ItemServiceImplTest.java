@@ -13,6 +13,7 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoOwner;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -295,6 +296,24 @@ public class ItemServiceImplTest {
     }
 
     @Test
+    public void commentItemTest_ThrowsException_CommentAlreadyExists() {
+        User masha = createUser(1, "Маша", "masha@yandex.ru");
+        Item item = createItem(1, "Книга", "Описание книги", true, masha, null);
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Отличная книга!");
+        List<Comment> comments = new ArrayList<>();
+        Comment existingComment = new Comment();
+        existingComment.setAuthor(masha);
+        existingComment.setItem(item);
+        existingComment.setText("Существующий комментарий");
+        comments.add(existingComment);
+        when(commentRepository.findCommentByItemId(item.getId())).thenReturn(comments);
+
+        assertThrows(NotFoundException.class,
+                () -> itemService.commentItem(item.getId(), commentDto, masha.getId()));
+    }
+
+    @Test
     void searchItemsBlankTextTest() {
 
         List<ItemDto> result = itemService.search("", FROM, SIZE);
@@ -335,5 +354,30 @@ public class ItemServiceImplTest {
         item.setOwner(owner);
         item.setRequest(itemRequest);
         return item;
+    }
+
+    @Test
+    public void validateCommentTextTest_ValidText() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("Отличная книга!");
+
+        assertDoesNotThrow(() -> itemService.validateCommentText(commentDto));
+    }
+
+
+    @Test
+    public void validateCommentTextTest_EmptyText_ThrowsValidationException() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("");
+
+        assertThrows(ValidationException.class, () -> itemService.validateCommentText(commentDto));
+    }
+
+    @Test
+    public void validateCommentTextTest_BlankText_ThrowsValidationException() {
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("    ");
+
+        assertThrows(ValidationException.class, () -> itemService.validateCommentText(commentDto));
     }
 }
