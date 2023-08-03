@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
@@ -13,6 +11,8 @@ import javax.persistence.*;
 @Table(name = "items")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @Entity
 public class Item {
@@ -28,7 +28,7 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     User owner;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "request_id", referencedColumnName = "id")
     ItemRequest request;
 }

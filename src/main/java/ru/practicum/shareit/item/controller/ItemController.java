@@ -3,20 +3,23 @@ package ru.practicum.shareit.item.controller;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoOwner;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
-@Slf4j
+
 @RestController
 @RequestMapping("/items")
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Validated
 public class ItemController {
     final ItemServiceImpl service;
 
@@ -43,12 +46,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoOwner> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer id) {
-        return service.getItemsByUserId(id);
+    public List<ItemDtoOwner> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer id,
+                                          @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+                                          @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return service.getItemsByUserId(id, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestParam String text) {
-        return service.search(text);
+    public List<ItemDto> searchItems(@RequestParam String text, @RequestHeader("X-Sharer-User-Id")
+    @RequestParam(defaultValue = "0") Integer from,
+                                     @RequestParam(defaultValue = "10") Integer size) {
+        return service.search(text, from, size);
     }
+
 }

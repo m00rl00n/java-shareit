@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -16,6 +17,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -35,13 +38,19 @@ public class ItemServiceImpl implements ItemService {
     final UserRepository userRepository;
     final BookingRepository bookingRepository;
     final CommentRepository commentRepository;
+    final RequestRepository requestRepository;
 
     @Override
     public ItemDto add(ItemDto itemDto, Integer id) {
         validate(itemDto, id);
         log.info("Добавление вещи");
         User user = getUserById(id);
-        Item item = createItem(itemDto, user);
+        Item item = ItemDtoMapper.toItem(itemDto, user, null);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = requestRepository.findById(itemDto.getRequestId()).orElseThrow(() ->
+                    new NotFoundException("Запрос с айди " + itemDto.getRequestId() + " не найден"));
+            item.setRequest(itemRequest);
+        }
         return ItemDtoMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -50,9 +59,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
-    private Item createItem(ItemDto itemDto, User user) {
-        return ItemDtoMapper.toItem(itemDto, user);
-    }
+
 
     @Override
     public ItemDto update(Integer itemId, ItemDto itemDto, Integer userId) {
@@ -174,28 +181,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOwner> getItemsByUserId(Integer userId) {
+    public List<ItemDtoOwner> getItemsByUserId(Integer userId, Integer from, Integer size) {
         LocalDateTime now = LocalDateTime.now();
-        log.info("Получение вещей пользователя");
+        log.info("Получение вещей пользователя с пагинацией");
         List<Booking> lastBookings = getLastBookingsByStatusAndEndIsBefore(String.valueOf(APPROVED), now);
         List<Booking> nextBookings = getNextBookingsByStatusAndStartIsAfter(String.valueOf(APPROVED), now);
-        return getItemDtoOwnersByOwnerId(userId, lastBookings, nextBookings);
+        return getItemDtoOwnersByOwnerIdWithPagination(userId, from, size, lastBookings, nextBookings);
     }
-
-    private List<Booking> getLastBookingsByStatusAndEndIsBefore(String status, LocalDateTime endDateTime) {
-        return bookingRepository.findBookingsByStatusAndEndIsBeforeOrderByStartDesc(Status.valueOf(status),
-                endDateTime);
-    }
-
-    private List<Booking> getNextBookingsByStatusAndStartIsAfter(String status, LocalDateTime startDateTime) {
-        return bookingRepository.findBookingsByStatusAndStartIsAfterOrderByStartAsc(Status.valueOf(status),
-                startDateTime);
-    }
-
-    private List<ItemDtoOwner> getItemDtoOwnersByOwnerId(Integer ownerId, List<Booking> lastBookings,
-                                                         List<Booking> nextBookings) {
+    private List<ItemDtoOwner> getItemDtoOwnersByOwnerIdWithPagination(Integer ownerId, Integer from, Integer size,
+                                                                       List<Booking> lastBookings,
+                                                                       List<Booking> nextBookings) {
         List<ItemDtoOwner> items = new ArrayList<>();
-        List<Item> ownerItems = getItemsByOwnerIdOrderByIdAsc(ownerId);
+        PageRequest pageRequest = PageRequest.of(from / size, size);
+        List<Item> ownerItems = getItemsByOwnerIdOrderByIdAsc(ownerId, pageRequest);
         for (Item item : ownerItems) {
             ItemDtoOwner itemDtoOwner = ItemDtoMapper.toItemDtoOwner(item);
             Booking lastBooking = getLastBookingByItem(item.getId(), lastBookings);
@@ -211,8 +209,20 @@ public class ItemServiceImpl implements ItemService {
         return items;
     }
 
-    private List<Item> getItemsByOwnerIdOrderByIdAsc(Integer ownerId) {
-        return itemRepository.findByOwnerIdOrderByIdAsc(ownerId);
+
+    private List<Booking> getLastBookingsByStatusAndEndIsBefore(String status, LocalDateTime endDateTime) {
+        return bookingRepository.findBookingsByStatusAndEndIsBeforeOrderByStartDesc(Status.valueOf(status),
+                endDateTime);
+    }
+
+    private List<Booking> getNextBookingsByStatusAndStartIsAfter(String status, LocalDateTime startDateTime) {
+        return bookingRepository.findBookingsByStatusAndStartIsAfterOrderByStartAsc(Status.valueOf(status),
+                startDateTime);
+    }
+
+
+    private List<Item> getItemsByOwnerIdOrderByIdAsc(Integer ownerId, PageRequest pageRequest) {
+        return itemRepository.findByOwnerIdOrderByIdAsc(ownerId, pageRequest);
     }
 
     private Booking getLastBookingByItem(Integer itemId, List<Booking> lastBookings) {
@@ -234,22 +244,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         log.info("Поиск вещей содержащих ");
+
         if (text.isBlank()) {
             return Collections.emptyList();
         } else {
-            return performSearch(text);
+            List<Item> searchResults = itemRepository.search(text, PageRequest.of(from / size, size));
+            List<ItemDto> itemDtos = new ArrayList<>();
+            for (Item item : searchResults) {
+                itemDtos.add(ItemDtoMapper.toItemDto(item));
+            }
+            return itemDtos;
         }
-    }
-
-    private List<ItemDto> performSearch(String text) {
-        List<Item> searchResults = itemRepository.search(text);
-        List<ItemDto> itemDtos = new ArrayList<>();
-        for (Item item : searchResults) {
-            itemDtos.add(ItemDtoMapper.toItemDto(item));
-        }
-        return itemDtos;
     }
 
     private void validate(ItemDto itemDto, Integer userId) {
@@ -267,3 +274,4 @@ public class ItemServiceImpl implements ItemService {
         }
     }
 }
+
