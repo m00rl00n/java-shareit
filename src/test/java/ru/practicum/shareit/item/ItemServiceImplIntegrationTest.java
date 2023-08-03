@@ -18,6 +18,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.RequestRepository;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -64,7 +65,6 @@ public class ItemServiceImplIntegrationTest {
         item.setRequest(itemRequest);
         return itemRepository.save(item);
     }
-
     private Booking createBooking(Item item, User booker) {
         Booking booking = new Booking();
         booking.setItem(item);
@@ -219,13 +219,39 @@ public class ItemServiceImplIntegrationTest {
     }
 
     @Test
-    public void commentItemTest_ThrowsValidationException() {
+    public void commentItemTest_ThrowsValidationException_NoActiveBooking() {
         User masha = createUser("Маша", "masha@yandex.ru");
         Item item = createItem("Книга", "Описание книги", true, masha, null);
         CommentDto commentDto = new CommentDto();
-        commentDto.setText("");
-
+        commentDto.setText("Отличная книга!");
         assertThrows(ValidationException.class,
                 () -> itemService.commentItem(item.getId(), commentDto, masha.getId()));
     }
+    @Test
+    public void addTest_WithNonExistentRequestId_ThrowsNotFoundException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Книга");
+        itemDto.setDescription("Описание книги");
+        itemDto.setAvailable(true);
+        itemDto.setRequestId(999);
+
+        assertThrows(NotFoundException.class, () -> itemService.add(itemDto, masha.getId()));
+    }
+    @Test
+    public void updateTest_WithDifferentOwner_ThrowsNotFoundException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        User vasya = createUser("Вася", "vasya@mail.ru");
+
+        Item item = createItem("Книга", "Описание книги", true, masha, null);
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Новая книга");
+        itemDto.setDescription("Новое описание");
+        itemDto.setAvailable(false);
+
+        assertThrows(NotFoundException.class, () -> itemService.update(item.getId(), itemDto, vasya.getId()));
+    }
 }
+
+
+
