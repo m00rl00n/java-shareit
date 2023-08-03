@@ -18,7 +18,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.RequestRepository;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -65,6 +64,7 @@ public class ItemServiceImplIntegrationTest {
         item.setRequest(itemRequest);
         return itemRepository.save(item);
     }
+
     private Booking createBooking(Item item, User booker) {
         Booking booking = new Booking();
         booking.setItem(item);
@@ -227,6 +227,7 @@ public class ItemServiceImplIntegrationTest {
         assertThrows(ValidationException.class,
                 () -> itemService.commentItem(item.getId(), commentDto, masha.getId()));
     }
+
     @Test
     public void addTest_WithNonExistentRequestId_ThrowsNotFoundException() {
         User masha = createUser("Маша", "masha@yandex.ru");
@@ -238,6 +239,7 @@ public class ItemServiceImplIntegrationTest {
 
         assertThrows(NotFoundException.class, () -> itemService.add(itemDto, masha.getId()));
     }
+
     @Test
     public void updateTest_WithDifferentOwner_ThrowsNotFoundException() {
         User masha = createUser("Маша", "masha@yandex.ru");
