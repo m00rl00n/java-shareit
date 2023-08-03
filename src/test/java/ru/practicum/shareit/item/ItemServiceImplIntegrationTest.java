@@ -4,7 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoOwner;
 import ru.practicum.shareit.item.model.Item;
@@ -16,10 +21,10 @@ import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -58,6 +63,16 @@ public class ItemServiceImplIntegrationTest {
         item.setOwner(owner);
         item.setRequest(itemRequest);
         return itemRepository.save(item);
+    }
+
+    private Booking createBooking(Item item, User booker) {
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStart(LocalDateTime.now().plusDays(1));
+        booking.setEnd(LocalDateTime.now().plusDays(5));
+        booking.setStatus(Status.APPROVED);
+        return bookingRepository.save(booking);
     }
 
 
@@ -147,5 +162,70 @@ public class ItemServiceImplIntegrationTest {
         assertEquals(item2.getName(), result.get(1).getName());
         assertEquals(item2.getDescription(), result.get(1).getDescription());
         assertEquals(item2.getAvailable(), result.get(1).getAvailable());
+    }
+
+    @Test
+    public void validateTest_ValidData() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Книга");
+        itemDto.setDescription("Описание книги");
+        itemDto.setAvailable(true);
+
+        assertDoesNotThrow(() -> itemService.add(itemDto, masha.getId()));
+    }
+
+    @Test
+    public void validateTest_NullUserId_ThrowsNotFoundException() {
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Книга");
+        itemDto.setDescription("Описание книги");
+        itemDto.setAvailable(true);
+
+        assertThrows(NotFoundException.class, () -> itemService.add(itemDto, null));
+    }
+
+    @Test
+    public void validateTest_EmptyName_ThrowsValidationException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("");
+        itemDto.setDescription("Описание книги");
+        itemDto.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> itemService.add(itemDto, masha.getId()));
+    }
+
+    @Test
+    public void validateTest_NullDescription_ThrowsValidationException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Книга");
+        itemDto.setDescription(null);
+        itemDto.setAvailable(true);
+
+        assertThrows(ValidationException.class, () -> itemService.add(itemDto, masha.getId()));
+    }
+
+    @Test
+    public void validateTest_NullAvailability_ThrowsValidationException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        ItemDto itemDto = new ItemDto();
+        itemDto.setName("Книга");
+        itemDto.setDescription("Описание книги");
+        itemDto.setAvailable(null);
+
+        assertThrows(ValidationException.class, () -> itemService.add(itemDto, masha.getId()));
+    }
+
+    @Test
+    public void commentItemTest_ThrowsValidationException() {
+        User masha = createUser("Маша", "masha@yandex.ru");
+        Item item = createItem("Книга", "Описание книги", true, masha, null);
+        CommentDto commentDto = new CommentDto();
+        commentDto.setText("");
+
+        assertThrows(ValidationException.class,
+                () -> itemService.commentItem(item.getId(), commentDto, masha.getId()));
     }
 }
