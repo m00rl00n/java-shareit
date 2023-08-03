@@ -60,7 +60,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-
     @Override
     public ItemDto update(Integer itemId, ItemDto itemDto, Integer userId) {
         Item item = getItemById(itemId);
@@ -188,9 +187,8 @@ public class ItemServiceImpl implements ItemService {
         List<Booking> nextBookings = getNextBookingsByStatusAndStartIsAfter(String.valueOf(APPROVED), now);
         return getItemDtoOwnersByOwnerIdWithPagination(userId, from, size, lastBookings, nextBookings);
     }
-    private List<ItemDtoOwner> getItemDtoOwnersByOwnerIdWithPagination(Integer ownerId, Integer from, Integer size,
-                                                                       List<Booking> lastBookings,
-                                                                       List<Booking> nextBookings) {
+
+    private List<ItemDtoOwner> getItemDtoOwnersByOwnerIdWithPagination(Integer ownerId, Integer from, Integer size, List<Booking> lastBookings, List<Booking> nextBookings) {
         List<ItemDtoOwner> items = new ArrayList<>();
         PageRequest pageRequest = PageRequest.of(from / size, size);
         List<Item> ownerItems = getItemsByOwnerIdOrderByIdAsc(ownerId, pageRequest);

@@ -92,8 +92,7 @@ public class RequestServiceImpl implements RequestService {
         return itemRequestDtos;
     }
 
-    private List<ItemRequestDto> getRequestDtosByRequestorIdNotOrderByCreatedAsc
-            (Integer userId, Integer from, Integer size) {
+    private List<ItemRequestDto> getRequestDtosByRequestorIdNotOrderByCreatedAsc(Integer userId, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from / size, size);
         List<ItemRequest> itemRequests = requestRepository
                 .findItemRequestsByRequestorIdNotOrderByCreatedAsc(userId, pageable);
