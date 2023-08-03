@@ -3,20 +3,20 @@ package ru.practicum.shareit.item.dto;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ItemDto {
+public class ItemDtoOwner {
     Integer id;
     String name;
     String description;
     Boolean available;
-    User owner;
     ItemRequest request;
+    BookingDto lastBooking;
+    BookingDto nextBooking;
     List<CommentDto> comments;
 }

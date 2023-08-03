@@ -1,5 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +13,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
-    private final UserService userService;
+    final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {

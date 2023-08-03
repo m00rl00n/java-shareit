@@ -1,56 +1,54 @@
 package ru.practicum.shareit.item.controller;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.dto.ItemDtoOwner;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/items")
-@Slf4j
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemController {
-    static final String USER_ID_REQUEST_HEADER = "X-Sharer-User-Id";
-    final ItemService itemService;
-
-    @Autowired
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    @GetMapping
-    public List<ItemDto> getItems(@RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId) {
-        return itemService.getItemsByUserId(userId);
-    }
-
-    @GetMapping("/{itemId}")
-    public ItemDto getItemById(
-            @RequestHeader(value = USER_ID_REQUEST_HEADER)
-            @PathVariable Integer itemId) {
-        return itemService.getItemById(itemId);
-    }
-
-    @GetMapping("/search")
-    public List<ItemDto> searchItemsByText(
-            @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
-            @RequestParam String text) {
-        return itemService.search(userId, text);
-    }
+    final ItemServiceImpl service;
 
     @PostMapping
-    public ItemDto addItem(
-            @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
-            @RequestBody ItemDto itemDto) {
-        return itemService.add(userId, itemDto);
+    public ItemDto add(@RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Integer id) {
+        return service.add(itemDto, id);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto commentItem(@PathVariable Integer itemId, @RequestBody CommentDto commentDto,
+                                  @RequestHeader("X-Sharer-User-Id") Integer id) {
+        return service.commentItem(itemId, commentDto, id);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(
-            @RequestHeader(value = USER_ID_REQUEST_HEADER) Integer userId,
-            @PathVariable Integer itemId,
-            @RequestBody ItemDto itemDto) {
-        return itemService.update(userId, itemId, itemDto);
+    public ItemDto update(@PathVariable Integer itemId, @RequestBody ItemDto itemDto,
+                          @RequestHeader("X-Sharer-User-Id") Integer id) {
+        return service.update(itemId, itemDto, id);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemDtoOwner getItem(@PathVariable Integer itemId, @RequestHeader("X-Sharer-User-Id") Integer userId) {
+        return service.getById(itemId, userId);
+    }
+
+    @GetMapping
+    public List<ItemDtoOwner> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer id) {
+        return service.getItemsByUserId(id);
+    }
+
+    @GetMapping("/search")
+    public List<ItemDto> searchItems(@RequestParam String text) {
+        return service.search(text);
     }
 }
