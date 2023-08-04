@@ -239,14 +239,12 @@ public class BookingServiceImplTest {
     public void getAllBookingsByUserTest() {
 
         User user = createUser(1, "Маша", "masha@yandex.ru");
-        ;
+
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
 
-
         User owner1 = createUser(1, "Маша1", "masha1@yandex.ru");
-        ;
         User owner2 = createUser(1, "Маша2", "masha2@yandex.ru");
-        ;
+
 
         Booking booking1 = createBooking(
                 1, LocalDateTime.now(), LocalDateTime.now().plusHours(1), new Item(), owner1, WAITING
@@ -265,7 +263,7 @@ public class BookingServiceImplTest {
         bookingsDB.add(booking2);
 
 
-        Pageable pageable = PageRequest.of(FROM / SIZE, SIZE, Sort.by(Sort.Direction.DESC, "start"));
+        Pageable pageable = getPageable();
         Page<Booking> bookingPage = new PageImpl<>(bookingsDB, pageable, bookingsDB.size());
         when(bookingRepository.findAllByBooker(eq(user), any(Pageable.class))).thenReturn(bookingPage);
 
@@ -299,9 +297,9 @@ public class BookingServiceImplTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
 
         User owner1 = createUser(1, "Маша1", "masha1@yandex.ru");
-        ;
+
         User owner2 = createUser(1, "Маша2", "masha2@yandex.ru");
-        ;
+
 
         Booking booking1 = createBooking(
                 1, LocalDateTime.now(), LocalDateTime.now().plusHours(1), new Item(), owner1, WAITING
@@ -319,7 +317,7 @@ public class BookingServiceImplTest {
         bookingsDB.add(booking1);
         bookingsDB.add(booking2);
 
-        Pageable pageable = PageRequest.of(FROM / SIZE, SIZE, Sort.by(Sort.Direction.DESC, "start"));
+        Pageable pageable = getPageable();
         Page<Booking> bookingPage = new PageImpl<>(bookingsDB, pageable, bookingsDB.size());
         when(bookingRepository.findAllByItemOwner(eq(user), any(Pageable.class)))
                 .thenReturn(bookingPage);
@@ -377,5 +375,9 @@ public class BookingServiceImplTest {
         booking.setBooker(booker);
         booking.setStatus(status);
         return booking;
+    }
+
+    private Pageable getPageable() {
+        return PageRequest.of(FROM / SIZE, SIZE, Sort.by(Sort.Direction.DESC, "start"));
     }
 }

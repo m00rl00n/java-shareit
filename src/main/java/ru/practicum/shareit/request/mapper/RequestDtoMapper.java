@@ -6,7 +6,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-
 public class RequestDtoMapper {
     public static ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User user) {
         ItemRequest itemRequest = new ItemRequest();
