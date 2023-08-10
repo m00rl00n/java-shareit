@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoReceived;
@@ -25,8 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingServiceImpl implements BookingService {
@@ -74,11 +77,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoReturned> getAllBookingsByUser(String state, Integer id) {
+    public List<BookingDtoReturned> getAllBookingsByUser(String state, Integer id, Integer from, Integer size) {
         final Sort sort = Sort.by(Sort.Direction.DESC, "start");
         User user = getUserById(id);
         log.info("Просмотр бронирований пользователем");
-        List<Booking> bookings = getBookingsByUserAndState(state, user, sort);
+
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+        Page<Booking> bookingPage = getBookingsByUserAndState(state, user, pageable);
+        List<Booking> bookings = bookingPage.getContent();
+
         List<BookingDtoReturned> bookingDtoList = new ArrayList<>();
 
         for (Booking booking : bookings) {
@@ -89,11 +96,15 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoReturned> getAllBookingsByOwner(String state, Integer id) {
+    public List<BookingDtoReturned> getAllBookingsByOwner(String state, Integer id, Integer from, Integer size) {
         final Sort sort = Sort.by(Sort.Direction.DESC, "start");
         User user = getUserById(id);
         log.info("Просмотр бронирований");
-        List<Booking> bookings = getBookingsByOwnerAndState(state, user, sort);
+
+        Pageable pageable = PageRequest.of(from / size, size, sort);
+        Page<Booking> bookingPage = getBookingsByOwnerAndState(state, user, pageable);
+        List<Booking> bookings = bookingPage.getContent();
+
         List<BookingDtoReturned> bookingDtoList = new ArrayList<>();
 
         for (Booking booking : bookings) {
@@ -102,6 +113,7 @@ public class BookingServiceImpl implements BookingService {
 
         return bookingDtoList;
     }
+
 
     private User getUserById(Integer userId) {
         return userRepository.findById(userId)
@@ -159,39 +171,41 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
-    private List<Booking> getBookingsByUserAndState(String state, User user, Sort sort) {
+    private Page<Booking> getBookingsByUserAndState(String state, User user, Pageable pageable) {
         switch (state.toUpperCase()) {
             case "ALL":
-                return bookingRepository.findAllByBooker(user, sort);
+                return bookingRepository.findAllByBooker(user, pageable);
             case "FUTURE":
-                return bookingRepository.findAllByBookerAndStartAfter(user, LocalDateTime.now(), sort);
+                return bookingRepository.findAllByBookerAndStartAfter(user, LocalDateTime.now(), pageable);
             case "CURRENT":
-                return bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, LocalDateTime.now(), LocalDateTime.now(), sort);
+                return bookingRepository.findAllByBookerAndStartBeforeAndEndAfter(user, LocalDateTime.now(),
+                        LocalDateTime.now(), pageable);
             case "PAST":
-                return bookingRepository.findAllByBookerAndEndBefore(user, LocalDateTime.now(), sort);
+                return bookingRepository.findAllByBookerAndEndBefore(user, LocalDateTime.now(), pageable);
             case "WAITING":
-                return bookingRepository.findAllByBookerAndStatusEquals(user, Status.WAITING, sort);
+                return bookingRepository.findAllByBookerAndStatusEquals(user, Status.WAITING, pageable);
             case "REJECTED":
-                return bookingRepository.findAllByBookerAndStatusEquals(user, Status.REJECTED, sort);
+                return bookingRepository.findAllByBookerAndStatusEquals(user, Status.REJECTED, pageable);
             default:
                 throw new UnsupportedStateException("Unknown state: " + state);
         }
     }
 
-    private List<Booking> getBookingsByOwnerAndState(String state, User user, Sort sort) {
+    private Page<Booking> getBookingsByOwnerAndState(String state, User user, Pageable pageable) {
         switch (state.toUpperCase()) {
             case "ALL":
-                return bookingRepository.findAllByItemOwner(user, sort);
+                return bookingRepository.findAllByItemOwner(user, pageable);
             case "FUTURE":
-                return bookingRepository.findAllByItemOwnerAndStartAfter(user, LocalDateTime.now(), sort);
+                return bookingRepository.findAllByItemOwnerAndStartAfter(user, LocalDateTime.now(), pageable);
             case "CURRENT":
-                return bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(user, LocalDateTime.now(), LocalDateTime.now(), sort);
+                return bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(user, LocalDateTime.now(),
+                        LocalDateTime.now(), pageable);
             case "PAST":
-                return bookingRepository.findAllByItemOwnerAndEndBefore(user, LocalDateTime.now(), sort);
+                return bookingRepository.findAllByItemOwnerAndEndBefore(user, LocalDateTime.now(), pageable);
             case "WAITING":
-                return bookingRepository.findAllByItemOwnerAndStatusEquals(user, Status.WAITING, sort);
+                return bookingRepository.findAllByItemOwnerAndStatusEquals(user, Status.WAITING, pageable);
             case "REJECTED":
-                return bookingRepository.findAllByItemOwnerAndStatusEquals(user, Status.REJECTED, sort);
+                return bookingRepository.findAllByItemOwnerAndStatusEquals(user, Status.REJECTED, pageable);
             default:
                 throw new UnsupportedStateException("Unknown state: " + state);
         }

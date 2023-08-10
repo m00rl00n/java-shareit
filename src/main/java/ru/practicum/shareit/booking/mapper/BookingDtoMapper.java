@@ -41,4 +41,16 @@ public class BookingDtoMapper {
         return bookingDto;
     }
 
+    public static BookingDtoReceived toBookingDtoReceived(Booking booking) {
+        BookingDtoReceived bookingDtoReceived = new BookingDtoReceived();
+        bookingDtoReceived.setId(booking.getId());
+        bookingDtoReceived.setStart(booking.getStart());
+        bookingDtoReceived.setEnd(booking.getEnd());
+        bookingDtoReceived.setItemId(booking.getItem().getId());
+        bookingDtoReceived.setBooker(booking.getBooker());
+        bookingDtoReceived.setStatus(booking.getStatus());
+        return bookingDtoReceived;
+    }
 }
+
+

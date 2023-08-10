@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.dto.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-
 import java.util.List;
 
 @Service
@@ -69,10 +68,10 @@ public class UserServiceImpl implements UserService {
         return userDtoMapper.toDto(userRepository.save(user));
     }
 
-    @Override
     public void remove(Integer id) {
         log.info("Удаление пользователя id=" + id);
-        userDtoMapper.toEntity(getUser(id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         userRepository.deleteById(id);
     }
 

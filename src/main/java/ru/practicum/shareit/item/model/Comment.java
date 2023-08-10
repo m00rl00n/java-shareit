@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.model.User;
 
@@ -11,6 +10,9 @@ import javax.persistence.*;
 @Entity
 @Table(name = "comments")
 @Data
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
     @Id
