@@ -1,8 +1,7 @@
 package ru.practicum.shareit.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.user.UserDto;
 
@@ -13,11 +12,13 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ItemRequestDto {
-    private Integer id;
+    Integer id;
     @NotEmpty
-    private String description;
-    private UserDto requestor;
-    private List<ItemDto> items;
-    private LocalDateTime created;
+    String description;
+    UserDto requestor;
+    List<ItemDto> items;
+    LocalDateTime created;
 }
