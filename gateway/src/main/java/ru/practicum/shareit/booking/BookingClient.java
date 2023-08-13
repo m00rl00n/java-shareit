@@ -51,7 +51,7 @@ public class BookingClient extends BaseClient {
                 "from", from,
                 "size", size
         );
-        log.info("Просмотр всех бронирований");
+        log.info("Просмотр бронирований");
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
 

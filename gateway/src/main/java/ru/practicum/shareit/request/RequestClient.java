@@ -10,6 +10,7 @@ import ru.practicum.shareit.client.BaseClient;
 
 import java.util.Map;
 
+;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)

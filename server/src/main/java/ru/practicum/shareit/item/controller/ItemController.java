@@ -45,8 +45,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoOwner> getAllItems(@RequestHeader("X-Sharer-User-Id") Integer id,
-                                          @RequestParam(defaultValue = "0") Integer from,
-                                          @RequestParam(defaultValue = "10") Integer size) {
+                                          @RequestParam(defaultValue = "0")  Integer from,
+                                          @RequestParam(defaultValue = "10")  Integer size) {
         return service.getItemsByUserId(id, from, size);
     }
 
