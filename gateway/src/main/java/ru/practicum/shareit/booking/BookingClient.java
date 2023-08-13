@@ -54,19 +54,21 @@ public class BookingClient extends BaseClient {
 
 
     public ResponseEntity<Object> getAllBookingsByOwner(Integer userId, State state, Integer from, Integer size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("state", state.name());
-        parameters.put("from", from);
-        parameters.put("size", size);
+        var parameters = Map.<String, Object>of(
+                "state", state.name(),
+                "from", from,
+                "size", size
+        );
         log.info("Просмотр бронирований");
         return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
 
     public ResponseEntity<Object> getAllBookingsByUser(Integer userId, State state, Integer from, Integer size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("state", state.name());
-        parameters.put("from", from);
-        parameters.put("size", size);
+        var parameters = Map.<String, Object>of(
+                "state", state.name(),
+                "from", from,
+                "size", size
+        );
         log.info("Просмотр бронирований");
 
         return get("?state={state}&from={from}&size={size}", userId, parameters);

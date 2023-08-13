@@ -53,19 +53,21 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> viewAllItems(Integer userId, Integer from, Integer size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("from", from);
-        parameters.put("size", size);
+        var parameters = Map.<String, Object>of(
+                "from", from,
+                "size", size
+        );
         log.info("Поиск всех вещей");
         String path = "?from={from}&size={size}";
         return get(path, userId, parameters);
     }
 
     public ResponseEntity<Object> search(String text, Integer userId, Integer from, Integer size) {
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("text", text);
-        parameters.put("from", from);
-        parameters.put("size", size);
+        var parameters = Map.<String, Object>of(
+                "text", text,
+                "from", from,
+                "size", size
+        );
         log.info("Поиск вещей");
         return get("/search?text={text}&from={from}&size={size}", userId, parameters);
     }
