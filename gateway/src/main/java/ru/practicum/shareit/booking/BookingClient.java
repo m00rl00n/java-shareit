@@ -1,41 +1,32 @@
 package ru.practicum.shareit.booking;
 
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.enums.State;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
+@Component
 @Slf4j
-@Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingClient extends BaseClient {
-    static final String API_PREFIX = "/bookings";
+
+    public static final String API_PREFIX = "/bookings";
 
     @Autowired
-    public BookingClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
-        );
+    public BookingClient(WebClient webClient) {
+        super(webClient);
     }
 
     public ResponseEntity<Object> create(Integer userId, BookingDto bookingDto) {
         log.info("Создание бронирования");
-        return post("", userId, bookingDto);
+        return post("", userId, bookingDto).block();
     }
 
     public ResponseEntity<Object> bookingConfirmation(Integer userId, Integer bookingId, Boolean approved) {
@@ -44,14 +35,13 @@ public class BookingClient extends BaseClient {
         parameters.put("approved", approved);
         log.info("Подтверждение бронирования");
 
-        return patch(path, userId, parameters);
+        return patch(path, userId, parameters).block();
     }
 
     public ResponseEntity<Object> getById(Integer userId, Integer bookingId) {
         log.info("Просмотр бронирования");
-        return get("/" + bookingId, userId);
+        return get("/" + bookingId, userId).block();
     }
-
 
     public ResponseEntity<Object> getAllBookingsByOwner(Integer userId, State state, Integer from, Integer size) {
         Map<String, Object> parameters = new HashMap<>();
@@ -59,7 +49,8 @@ public class BookingClient extends BaseClient {
         parameters.put("from", from);
         parameters.put("size", size);
         log.info("Просмотр бронирований");
-        return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
+
+        return get("/owner?state={state}&from={from}&size={size}", userId, parameters).block();
     }
 
     public ResponseEntity<Object> getAllBookingsByUser(Integer userId, State state, Integer from, Integer size) {
@@ -69,6 +60,6 @@ public class BookingClient extends BaseClient {
         parameters.put("size", size);
         log.info("Просмотр бронирований");
 
-        return get("?state={state}&from={from}&size={size}", userId, parameters);
+        return get("?state={state}&from={from}&size={size}", userId, parameters).block();
     }
 }

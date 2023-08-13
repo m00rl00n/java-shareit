@@ -1,45 +1,36 @@
 package ru.practicum.shareit.request;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.practicum.shareit.client.BaseClient;
 
 import java.util.HashMap;
 import java.util.Map;
 
+;
+
+@Component
 @Slf4j
-@Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RequestClient extends BaseClient {
 
     static final String API_PREFIX = "/requests";
 
     @Autowired
-    public RequestClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
-        );
+    public RequestClient(WebClient webClient) {
+        super(webClient);
     }
 
     public ResponseEntity<Object> create(Integer userId, ItemRequestDto requestDto) {
         log.info("Создание запроса");
-        return post("", userId, requestDto);
+        return post("", userId, requestDto).block();
     }
 
     public ResponseEntity<Object> getUserRequests(Integer userId) {
         log.info("Просмотр запросов");
-        return get("", userId);
+        return get("", userId).block();
     }
 
     public ResponseEntity<Object> getAll(Integer userId, Integer from, Integer size) {
@@ -48,11 +39,11 @@ public class RequestClient extends BaseClient {
         parameters.put("size", size);
         log.info("Просмотр всех запросов");
 
-        return get("/all?from={from}&size={size}", userId, parameters);
+        return get("/all?from={from}&size={size}", userId, parameters).block();
     }
 
     public ResponseEntity<Object> getById(Integer userId, Integer requestId) {
         log.info("Просмотр запроса");
-        return get("/" + requestId, userId);
+        return get("/" + requestId, userId).block();
     }
 }

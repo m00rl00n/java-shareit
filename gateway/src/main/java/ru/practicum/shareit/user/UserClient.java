@@ -1,56 +1,46 @@
 package ru.practicum.shareit.user;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.practicum.shareit.client.BaseClient;
 
+@Component
 @Slf4j
-@Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserClient extends BaseClient {
 
     static final String API_PREFIX = "/users";
 
     @Autowired
-    public UserClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
-                        .build()
-        );
+    public UserClient(WebClient webClient) {
+        super(webClient);
     }
 
     public ResponseEntity<Object> create(UserDto userDto) {
         log.info("Добавление нового пользователя");
-        return post("", userDto);
+        return post("", userDto).block();
     }
 
     public ResponseEntity<Object> getById(Integer userId) {
         log.info("Пользователь с айди " + userId);
-        return get("/" + userId);
+        return get("/" + userId).block();
     }
 
     public ResponseEntity<Object> getAll() {
         log.info("Получение всех пользователей");
-        return get("");
+        return get("").block();
     }
 
     public ResponseEntity<Object> update(Integer userId, UserDto userDto) {
         log.info("Обновление");
-        return patch("/" + userId, userDto);
+        return patch("/" + userId, userDto).block();
     }
 
     public ResponseEntity<Object> delete(Integer userId) {
         log.info("Удаление пользователь с айди " + userId);
-        return delete("/" + userId);
+        return delete("/" + userId).block();
     }
 }
