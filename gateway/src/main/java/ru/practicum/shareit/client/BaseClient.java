@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 public class BaseClient {
-    protected final RestTemplate rest;
 
-    public BaseClient(RestTemplate rest) {
+    protected final RestTemplate rest;
+    protected final String apiPrefix;
+
+    public BaseClient(RestTemplate rest, String apiPrefix) {
         this.rest = rest;
+        this.apiPrefix = apiPrefix;
     }
 
     protected ResponseEntity<Object> get(String path) {
